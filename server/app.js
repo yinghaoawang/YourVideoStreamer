@@ -15,6 +15,10 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(function(req, res, next) {
+    req.setTimeout(0);
+    next();
+});
 
 app.use('/', index);
 app.use('/video', video);
