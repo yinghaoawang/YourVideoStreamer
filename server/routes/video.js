@@ -14,7 +14,6 @@ AWS.config.loadFromPath('./config.json');
 
 var s3 = new AWS.S3();
 
-var bucketName = config.bucketName;
 var mysql = require('mysql');
 var connection = mysql.createConnection({
     host: config.mysql.host,
@@ -23,26 +22,12 @@ var connection = mysql.createConnection({
     database: config.mysql.database
 });
 
-//connection.connect();
-
-/*
-function uploadFromStream(s3) {
-    var pass = new stream.PassThrough();
-    var params = bucketParams;
-    params['Body'] = pass;
-    s3.upload(params, function(err, data){
-        console.log(err, data);
-    });
-    return pass;
-}
-*/
-
 router.get('/:key', function(req, res, next) {
     async.parallel([
         function(callback) {
             var key = req.params['key'];
             var params = {
-                Bucket: bucketName,
+                Bucket: config.bucketName,
                 Key: key,
             };
             var fileStream = s3.getObject(params).createReadStream();
@@ -57,14 +42,9 @@ router.get('/:key', function(req, res, next) {
 router.post('/', function(req, res, next) {
     async.waterfall([
         function(callback) {
-            var stats = fs.statSync(filePath);
-            var name = filename;
-            var size = stats.size;
-            var date_recorded = new Date().toISOString().slice(0, 19).replace('T', ' ');
-            var duration = 5000;
             var file = fs.createReadStream(filePath);
             var params = {
-                Bucket: bucketName,
+                Bucket: config.bucketName,
                 Key: filename,
                 Body: file,
             };
@@ -72,13 +52,13 @@ router.post('/', function(req, res, next) {
             s3.upload(params, function(err, data) {
                 if (err) callback(err);
                 else {
-                    var url = data.Location;
+                    var stats = fs.statSync(filePath);
                     var sqlData = {
-                        'name': name,
-                        'size': size,
-                        'date_recorded': date_recorded,
-                        'duration': duration,
-                        'url': url,
+                        'name': filename,
+                        'size': stats.size,
+                        'date_recorded': new Date().toISOString().slice(0, 19).replace('T', ' '),
+                        'duration': 5000,
+                        'url': data.Location,
                     };
                     callback(null, sqlData);
                 }
@@ -108,11 +88,10 @@ router.post('/', function(req, res, next) {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    console.log(bucketName);
     async.parallel([
         function(callback) {
             var params = {
-                Bucket: bucketName,
+                Bucket: config.bucketName,
             };
             s3.listObjects(params, function(err, data) {
                 if (err)

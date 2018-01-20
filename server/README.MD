@@ -1,12 +1,20 @@
 # Server
-Will be an api that utilizes other data hosting APIs since storing media is expensive.
+An API server that utilizes Amazon Web Services Simple Storage (AWS S3 to store videos.
+The database stores the aws file link as well as information to organize the videos.
 
 ## Getting started
-Create a config.json file that contains your AWS keys, and region
+Create a config.json with the following keys
 ```
 {
-    "accessKeyId": "accesskey",
-    "secretAccessKey": "secretaccesskey",
-    "region": "region"
+    "accessKeyId": "myKey",
+    "secretAccessKey": "mySecret",
+    "region": "myRegion",
+    "bucketName": "myBucket",
+    "mysql": {
+        "host": "myHost",
+        "user": "myUser",
+        "password": "myPass",
+        "database": "myDb"
+    }
 }
 ```
