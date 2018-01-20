@@ -2,6 +2,7 @@
 *.swp
 *.mp4
 *.avi
+server/config.json
 
 # Logs
 logs
