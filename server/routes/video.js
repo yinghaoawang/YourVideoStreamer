@@ -4,15 +4,26 @@ var request = require('request');
 var async = require('async');
 var fs = require('fs');
 //var filePath = ('./file.mp4');
-var filePath = ('./ronin.mp4');
+var filename = 'file.mp4';
+var filePath = ('./file.mp4');
 var stream = require('stream')
+var config = require("../config.json");
 
 var AWS = require('aws-sdk');
 AWS.config.loadFromPath('./config.json');
 
 var s3 = new AWS.S3();
 
-var BUCKET_NAME = 'yourvideostreamer';
+var bucketName = config.bucketName;
+var mysql = require('mysql');
+var connection = mysql.createConnection({
+    host: config.mysql.host,
+    user: config.mysql.user,
+    password: config.mysql.password,
+    database: config.mysql.database
+});
+
+//connection.connect();
 
 /*
 function uploadFromStream(s3) {
@@ -31,7 +42,7 @@ router.get('/:key', function(req, res, next) {
         function(callback) {
             var key = req.params['key'];
             var params = {
-                Bucket: BUCKET_NAME,
+                Bucket: bucketName,
                 Key: key,
             };
             var fileStream = s3.getObject(params).createReadStream();
@@ -44,43 +55,64 @@ router.get('/:key', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-    async.parallel([
+    async.waterfall([
         function(callback) {
-            fs.stat(filePath, function(err, stats) {
+            var stats = fs.statSync(filePath);
+            var name = filename;
+            var size = stats.size;
+            var date_recorded = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            var duration = 5000;
+            var file = fs.createReadStream(filePath);
+            var params = {
+                Bucket: bucketName,
+                Key: filename,
+                Body: file,
+            };
+            console.log("uploading");
+            s3.upload(params, function(err, data) {
                 if (err) callback(err);
                 else {
-                    console.log("preparing to read stream");
-                    var file = fs.createReadStream(filePath);
-                    console.log("read stream");
-                    var params = {
-                        Bucket: BUCKET_NAME,
-                        Key: 'ronin.mp4',
-                        Body: file,
+                    var url = data.Location;
+                    var sqlData = {
+                        'name': name,
+                        'size': size,
+                        'date_recorded': date_recorded,
+                        'duration': duration,
+                        'url': url,
                     };
-                    console.log("uploading");
-                    s3.upload(params, function(err, data) {
-                        if (err) callback(err);
-                        else {
-                            console.log("uploaded");
-                            callback(null, data);
-                        }
-                    });
+                    callback(null, sqlData);
                 }
             });
         },
+        function(sqlData, callback) {
+            console.log("uploaded");
+            var sql = "INSERT INTO videos (name, date_recorded, duration, size, url) VALUES ?";
+            var values = [
+                [sqlData.name, sqlData.date_recorded, sqlData.duration, sqlData.size, sqlData.url]
+            ];
+            connection.query(sql, [values], function(err, result) {
+                if (err) callback(err);
+                else {
+                    callback(null, result);
+                }
+            });
+        }
     ],
     function(err, results) {
         if (err) res.send(err);
-        else res.send(results);
+        else {
+            res.send(results);
+        }
     });
 });
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+    console.log(bucketName);
     async.parallel([
         function(callback) {
             var params = {
-                Bucket: BUCKET_NAME,
+                Bucket: bucketName,
             };
             s3.listObjects(params, function(err, data) {
                 if (err)
