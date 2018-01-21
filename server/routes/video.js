@@ -3,9 +3,6 @@ var router = express.Router();
 var request = require('request');
 var async = require('async');
 var fs = require('fs');
-//var filePath = ('./file.mp4');
-var filename = 'file.mp4';
-var filePath = ('./file.mp4');
 var stream = require('stream')
 var config = require("../config.json");
 
@@ -21,7 +18,9 @@ var connection = mysql.createConnection({
     password: config.mysql.password,
     database: config.mysql.database
 });
+connection.connect();
 
+// directly get a file from aws s3 where key is the name of the key on bucket
 router.get('/:key', function(req, res, next) {
     async.parallel([
         function(callback) {
@@ -39,7 +38,10 @@ router.get('/:key', function(req, res, next) {
     });
 });
 
+// when given params, upload file to aws and store the metadata in db as well as the direct aws file link
 router.post('/', function(req, res, next) {
+    var filename = 'file.mp4';
+    var filePath = ('./file.mp4');
     async.waterfall([
         function(callback) {
             var file = fs.createReadStream(filePath);
@@ -79,16 +81,17 @@ router.post('/', function(req, res, next) {
         }
     ],
     function(err, results) {
-        if (err) res.send(err);
-        else {
+        if (err)
+            res.send(err);
+        else
             res.send(results);
-        }
     });
 });
 
-/* GET home page. */
+// returns all database video metadata
 router.get('/', function(req, res, next) {
     async.parallel([
+        /*
         function(callback) {
             var params = {
                 Bucket: config.bucketName,
@@ -100,13 +103,24 @@ router.get('/', function(req, res, next) {
                     callback(null, data);
             });
         },
+        */
+        function(callback) {
+            var sql = "SELECT * FROM videos";
+            connection.query(sql, function(err, result) {
+                if (err) callback(err)
+                else
+                    callback(null, result);
+            });
+        }
     ],
     function(err, results) {
         if (err) {
             res.status(500).send(err);
         }
         //var contents = results[0]['Contents'];
-        res.send(JSON.stringify(results));
+        else {
+            res.send(JSON.stringify(results));
+        }
     });
 });
 router.get('/:id', function(req, res, next) {
