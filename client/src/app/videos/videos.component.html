@@ -1,3 +1,7 @@
-<p>
-  videos works!
-</p>
+<div *ngFor="let video of videos">
+    {{ video.name }}
+    {{ video.size }}
+    {{ video.duration }}
+    {{ video.date_recorded }}
+    {{ video.url }}
+</div>

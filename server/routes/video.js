@@ -119,7 +119,7 @@ router.get('/', function(req, res, next) {
         }
         //var contents = results[0]['Contents'];
         else {
-            res.send(JSON.stringify(results));
+            res.send(JSON.stringify(results[0]));
         }
     });
 });
