@@ -19,7 +19,7 @@ The database stores the aws file link as well as information to organize the vid
     }
     ```
 * Set public get bucket policy for your AWS S3 bucket
-    - Go to [http://awspolicygen.s3.amazonaws.com/policygen.html]
+    - Go to http://awspolicygen.s3.amazonaws.com/policygen.html
     - Use these settings
         - Type of Policy: S3 Bucket Policy
         - Effect: Allow

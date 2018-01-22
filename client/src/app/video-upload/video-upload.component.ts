@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { HttpParams, HttpHeaders, HttpClient } from '@angular/common/http';
 
 const URL = 'http://localhost:3000/video';
@@ -11,11 +11,16 @@ const URL = 'http://localhost:3000/video';
 
 
 export class VideoUploadComponent implements OnInit {
+    @ViewChild('fileInput') fileInput: ElementRef;
+
+    public message: string;
+
     constructor(private http: HttpClient) { }
     ngOnInit() { }
 
 
     fileChange(event): void {
+        this.fileInput.nativeElement.disabled = true;
         let fileList: FileList = event.target.files;
         if (fileList.length == 0) return;
         let file = fileList[0];
@@ -26,36 +31,14 @@ export class VideoUploadComponent implements OnInit {
         formData.append('music', 'sogod');
         formData.append('file', file);
 
-        this.http.post(URL, formData).subscribe(data => console.log(data));
-        /*
-        let params = new HttpParams();
-        let formData = new FormData();
-        formData.append('upload', selectedFile.nativeElement.files[0]);
+        this.message = "Uploading...";
+        this.http.post(URL, formData).subscribe(data => {
+            this.fileInput.nativeElement.disabled = false;
 
-        const options =  {
-            headers: new HttpHeaders().set('Accept', 'application/json'),
-            params: params,
-            reportProgress: true,
-            withCredentials: true,
-        };
-        this.http.post(URL, formData, options).subscribe(data => {
-            data => {
-                console.log("Subscribe data", data);
-            };
+            let prevValue = this.fileInput.nativeElement.value;
+            this.message = prevValue + " uploaded.";
+
+            this.fileInput.nativeElement.value = "";
         });
-*/
     }
-
-
-
-    /*
-    fileChange(event) {
-    let fileList: FileList = event.target.files;
-    if (fileList.length == 0) return;
-    let file: File = fileList[0];
-    let headers = new Headers();
-    headers.append('Accept', 'application/json');
-    let options = new RequestOptions({ headers: headers });
-    this.http.post('${
-    */
 }
