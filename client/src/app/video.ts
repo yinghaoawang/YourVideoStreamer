@@ -1,4 +1,5 @@
 export class Video {
+    id: number;
     name: string;
     size: number;
     duration: number;

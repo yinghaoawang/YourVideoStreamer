@@ -1,8 +1,21 @@
 <app-video-detail [video]="selectedVideo"></app-video-detail>
-<div *ngFor="let video of videos">
-    {{ video.name }}
-    {{ video.size }}
-    {{ video.duration }}
-    {{ video.date_recorded }}
-    {{ video.url }}
-</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Duration</th>
+            <th>Date Recorded</th>
+            <th>URL</th>
+        </tr>
+    </thead>
+    <tbody *ngFor="let video of videos">
+        <td>
+            <a routerLink="/videos/{{ video.id }}"> {{ video.name }}</a>
+        </td>
+        <td>{{ video.size }}</td>
+        <td>{{ video.duration }}</td>
+        <td>{{ video.date_recorded }}</td>
+        <td>{{ video.url }}</td>
+    </tbody>
+</table>

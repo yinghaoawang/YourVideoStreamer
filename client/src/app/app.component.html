@@ -1,5 +1,20 @@
-<h1>{{ title }}</h1>
-<nav>
-    <a routerLink="/videos">Videos</a>
+<!--
+<nav class="navbar">
+    <a class="navbar-brand" routerLink="/">{{ title }}</a>
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" routerLink="/">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" routerLink="/videos">Videos</a>
+        </li>
+    </ul>
 </nav>
-<router-outlet></router-outlet>
+-->
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <a class="navbar-brand" routerLink="/">{{ title }}</a>
+    <a class="nav-link" routerLink="/videos">Videos</a>
+</nav>
+<div class="container">
+    <router-outlet></router-outlet>
+</div>

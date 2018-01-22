@@ -1,4 +1,7 @@
 <div *ngIf="video">
+    <button type="button" class="btn btn-primary" (click)="goBack()">Back</button>
     <h2>{{ video.name }}</h2>
-    <p>Streaming here</p>
+    <video controls preload=auto width=640 height=264 data-setup="{}">
+        <source src="{{ video.url }}" type='video/mp4'/>
+    </video>
 </div>

@@ -20,6 +20,7 @@ var connection = mysql.createConnection({
 });
 connection.connect();
 
+/*
 // directly get a file from aws s3 where key is the name of the key on bucket
 router.get('/:key', function(req, res, next) {
     async.parallel([
@@ -37,6 +38,7 @@ router.get('/:key', function(req, res, next) {
         else res.send(results);
     });
 });
+*/
 
 // when given params, upload file to aws and store the metadata in db as well as the direct aws file link
 router.post('/', function(req, res, next) {
@@ -91,19 +93,6 @@ router.post('/', function(req, res, next) {
 // returns all database video metadata
 router.get('/', function(req, res, next) {
     async.parallel([
-        /*
-        function(callback) {
-            var params = {
-                Bucket: config.bucketName,
-            };
-            s3.listObjects(params, function(err, data) {
-                if (err)
-                    callback(err);
-                else
-                    callback(null, data);
-            });
-        },
-        */
         function(callback) {
             var sql = "SELECT * FROM videos";
             connection.query(sql, function(err, result) {
@@ -117,14 +106,32 @@ router.get('/', function(req, res, next) {
         if (err) {
             res.status(500).send(err);
         }
-        //var contents = results[0]['Contents'];
         else {
-            res.send(JSON.stringify(results[0]));
+            res.send(results[0]);
         }
     });
 });
+
 router.get('/:id', function(req, res, next) {
-    res.send("Get sent with these params: " + JSON.stringify(req.params));
+    var id = req.params.id;
+    async.parallel([
+        function(callback) {
+            var sql = "SELECT * FROM videos WHERE ID=" + id;
+            connection.query(sql, function(err, result) {
+                if (err) callback(err)
+                else
+                    callback(null, result);
+            });
+        }
+    ],
+    function(err, results) {
+        if (err) {
+            res.status(500).send(err);
+        }
+        else {
+            res.send(results[0]);
+        }
+    });
 });
 
 

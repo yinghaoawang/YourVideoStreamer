@@ -10,8 +10,6 @@ import { VideoService } from '../video.service';
 
 export class VideosComponent implements OnInit {
     videos: Video[] = [];
-    //public data: any;
-    //public localVar: any;
 
     constructor(private videoService: VideoService) { }
 

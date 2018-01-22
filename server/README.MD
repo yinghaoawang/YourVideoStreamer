@@ -19,6 +19,7 @@ The database stores the aws file link as well as information to organize the vid
         }
         ```
     * Install dependencies with `npm install`
+    * Build mySql db and tables with `mysql -u <youruser> -p createDB.sql` (it will query you for password)
     * Start node server
         * Normally with `npm start`
         * or with a watcher `npm run devstart`
