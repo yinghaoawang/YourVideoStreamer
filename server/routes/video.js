@@ -4,7 +4,10 @@ var request = require('request');
 var async = require('async');
 var fs = require('fs');
 var stream = require('stream')
-var config = require("../config.json");
+var config = require('../config.json');
+var multer = require('multer');
+var upload = multer({ dest: 'tmp/' });
+var probe = require('node-ffprobe');
 
 var AWS = require('aws-sdk');
 AWS.config.loadFromPath('./config.json');
@@ -41,27 +44,39 @@ router.get('/:key', function(req, res, next) {
 */
 
 // when given params, upload file to aws and store the metadata in db as well as the direct aws file link
-router.post('/', function(req, res, next) {
-    var filename = 'file.mp4';
-    var filePath = ('./file.mp4');
+router.post('/', upload.single('file'), function(req, res, next) {
+    var rawFile = req.file;
+    var filePath = __dirname + "/../" + rawFile.path;
     async.waterfall([
         function(callback) {
+            probe(filePath, function(err, probeData) {
+                if (err) {
+                    callback(err)
+                }
+                else callback(null, probeData);
+            });
+        },
+        function(probeData, callback) {
+            var duration = probeData.format.duration;
+            var dateRecorded = "2008-11-11 13:23:44";
             var file = fs.createReadStream(filePath);
             var params = {
                 Bucket: config.bucketName,
-                Key: filename,
+                Key: rawFile.originalname,
                 Body: file,
             };
             console.log("uploading");
             s3.upload(params, function(err, data) {
-                if (err) callback(err);
+                if (err) {
+                    console.log(err);
+                    callback(err);
+                }
                 else {
-                    var stats = fs.statSync(filePath);
                     var sqlData = {
-                        'name': filename,
-                        'size': stats.size,
-                        'date_recorded': new Date().toISOString().slice(0, 19).replace('T', ' '),
-                        'duration': 5000,
+                        'name': rawFile.originalname,
+                        'size': rawFile.size,
+                        'date_recorded': dateRecorded,
+                        'duration': duration,
                         'url': data.Location,
                     };
                     callback(null, sqlData);
