@@ -45,3 +45,15 @@ The database stores the aws file link as well as information to organize the vid
 - NodeJS - Javascript backend
 - AWS S3 - File store
 - MySQL - Basic relation database
+
+
+## Weaknesses
+- Uploads the file twice
+    - frontend to backend
+    - backend to file host (aws s3)
+- Reads the file three times
+    - frontend
+        -form-data reading
+    - backend
+        - ffprobe reads to get metadata
+        - fs creates a readstream to upload to aws s3 because they don't accept stream uploading

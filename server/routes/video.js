@@ -58,8 +58,11 @@ router.post('/', upload.single('file'), function(req, res, next) {
         },
         function(probeData, callback) {
             var duration = probeData.format.duration;
-            var dateRecorded = "2008-11-11 13:23:44";
+            // default date recorded value
+            var dateRecorded = new Date().toISOString().slice(0, 19).replace('T', ' ');
             var file = fs.createReadStream(filePath);
+            var stat = fs.statSync(filePath);
+            dateRecorded = stat.ctime;
             var params = {
                 Bucket: config.bucketName,
                 Key: rawFile.originalname,
