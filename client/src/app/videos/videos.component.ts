@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Video } from '../video';
-import { HttpClient } from '@angular/common/http';
-import 'rxjs/add/operator/map';
+import { VideoService } from '../video.service';
 
 @Component({
   selector: 'app-videos',
@@ -14,23 +13,13 @@ export class VideosComponent implements OnInit {
     //public data: any;
     //public localVar: any;
 
-    constructor(private http: HttpClient) { }
+    constructor(private videoService: VideoService) { }
+
+    getVideoList(): void {
+        this.videos = this.videoService.getVideoList();
+    }
 
     ngOnInit() {
-        let path = 'http://localhost:3000/video';
-        this.http.get(path).subscribe(data => {
-            for (let i in data) {
-                let entry = data[i];
-                let video = {
-                    name: entry.name,
-                    size: entry.size,
-                    duration: entry.duration,
-                    date_recorded: entry.date_recorded,
-                    url: entry.url
-                };
-                //console.log(video.name);
-                this.videos.push(video);
-            }
-        });
+        this.getVideoList();
     }
 }
