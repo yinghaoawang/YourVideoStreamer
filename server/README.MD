@@ -18,6 +18,22 @@ The database stores the aws file link as well as information to organize the vid
             }
         }
         ```
+    * Set public get bucket policy for your AWS S3 bucket
+        - Go to [http://awspolicygen.s3.amazonaws.com/policygen.html]
+        - Use these settings
+            - Type of Policy: S3 Bucket Policy
+            - Effect: Allow
+            - Principal: *
+            - AWS Service: Amazon S3
+            - Actions: [x] GetObject
+            - Amazon Resource Name (ARN): arn:aws:s3:::<bucket_name>/*
+        - Click Add Statement
+        - Click Generate Policy
+            - Copy the text onto clipboard
+        - Go to your bucket on AWS console
+        - Go to Permissions > Bucket Policy
+            - Paste text from clipboard
+            - Save
     * Install dependencies with `npm install`
     * Build mySql db and tables with `mysql -u <youruser> -p createDB.sql` (it will query you for password)
     * Start node server
