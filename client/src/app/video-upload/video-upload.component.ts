@@ -32,13 +32,19 @@ export class VideoUploadComponent implements OnInit {
         formData.append('file', file);
 
         this.message = "Uploading...";
-        this.http.post(URL, formData).subscribe(data => {
-            this.fileInput.nativeElement.disabled = false;
+        this.http.post(URL, formData).subscribe(
+            data => {
+                this.fileInput.nativeElement.disabled = false;
 
-            let prevValue = this.fileInput.nativeElement.value;
-            this.message = prevValue + " uploaded.";
+                let prevValue = this.fileInput.nativeElement.value;
+                this.message = prevValue + " uploaded.";
 
-            this.fileInput.nativeElement.value = "";
-        });
+                this.fileInput.nativeElement.value = "";
+            },
+            error => {
+                console.log(error);
+                this.message = error.message;
+            },
+        );
     }
 }
