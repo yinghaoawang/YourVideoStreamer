@@ -53,23 +53,22 @@ router.post('/', upload.single('file'), function(req, res, next) {
     var filePath = __dirname + "/../" + rawFile.path;
     async.waterfall([
         function(callback) {
-            /*
             var probeData = {
                 "format": {
-                    "duration": 123,
+                    "duration": 0,
                 }
             };
             callback(null, probeData);
-            */
 
-            console.log(filePath);
-            console.log(rawFile.filepath);
+            /* UNCOMMENT THIS ON LOCAL SERVER TO GET ACTUAL DURATION (COMMENTED BECAUSE DOES NOT WORK ON AWS)
             probe(filePath, function(err, probeData) {
                 if (err) {
+                    console.err("error in probing");
                     callback(err)
                 }
                 else callback(null, probeData);
             });
+            */
         },
         function(probeData, callback) {
             if (duration == null && probeData != null && probeData.format != null && probeData.format.duration != null)
