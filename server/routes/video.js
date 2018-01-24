@@ -45,10 +45,25 @@ router.get('/:key', function(req, res, next) {
 
 // when given params, upload file to aws and store the metadata in db as well as the direct aws file link
 router.post('/', upload.single('file'), function(req, res, next) {
+    var duration, dateRecorded, name, size;
+    if (req.body.duration) duration = req.body.duration;
+    if (req.body.dateRecorded) dateRecorded = req.body.dateRecorded;
+    console.log("hello");
     var rawFile = req.file;
     var filePath = __dirname + "/../" + rawFile.path;
     async.waterfall([
         function(callback) {
+            /*
+            var probeData = {
+                "format": {
+                    "duration": 123,
+                }
+            };
+            callback(null, probeData);
+            */
+
+            console.log(filePath);
+            console.log(rawFile.filepath);
             probe(filePath, function(err, probeData) {
                 if (err) {
                     callback(err)
@@ -57,17 +72,19 @@ router.post('/', upload.single('file'), function(req, res, next) {
             });
         },
         function(probeData, callback) {
-            var duration = probeData.format.duration;
+            if (duration == null && probeData != null && probeData.format != null && probeData.format.duration != null)
+                duration = probeData.format.duration;
             // default date recorded value
-            var dateRecorded = new Date().toISOString().slice(0, 19).replace('T', ' ');
             var file = fs.createReadStream(filePath);
             var stat = fs.statSync(filePath);
-            dateRecorded = stat.ctime;
+            if (dateRecorded == null) dateRecorded = stat.ctime;
             var params = {
                 Bucket: config.bucketName,
                 Key: rawFile.originalname,
                 Body: file,
             };
+            if (dateRecorded == null) dateRecorded = new Date().toISOString().slice(0, 19).replace('T', ' ');
+            if (duration == null) duration = 0;
             console.log("uploading");
             s3.upload(params, function(err, data) {
                 if (err) {

@@ -1,7 +1,7 @@
 import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { HttpParams, HttpHeaders, HttpClient } from '@angular/common/http';
+import { VideoService } from '../video.service';
 
-const URL = 'http://localhost:3000/video';
 
 @Component({
   selector: 'app-video-upload',
@@ -15,11 +15,15 @@ export class VideoUploadComponent implements OnInit {
 
     public message: string;
 
-    constructor(private http: HttpClient) { }
+    constructor(
+        private http: HttpClient,
+        private videoService: VideoService,
+    ) { }
     ngOnInit() { }
 
 
     fileChange(event): void {
+        let URL = this.videoService.URL;
         this.fileInput.nativeElement.disabled = true;
         let fileList: FileList = event.target.files;
         if (fileList.length == 0) return;
@@ -32,7 +36,7 @@ export class VideoUploadComponent implements OnInit {
         formData.append('file', file);
 
         this.message = "Uploading...";
-        this.http.post(URL, formData).subscribe(
+        this.http.post(URL + "/video", formData).subscribe(
             data => {
                 this.fileInput.nativeElement.disabled = false;
 

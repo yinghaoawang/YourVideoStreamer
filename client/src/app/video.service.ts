@@ -6,13 +6,12 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 export class VideoService {
-    path: string = 'http://localhost:3000/video';
+    public URL: string = 'http://localhost:8081';
 
     constructor(private http: HttpClient) { }
 
     getVideo(id: number): Observable<Video> {
-        let path2 = this.path + "/" + id;
-        return this.http.get(path2).map(data => {
+        return this.http.get(this.URL + "/video/" + id).map(data => {
             let video: Video;
             if (Object.keys(data).length == 0) return video;
 
@@ -33,7 +32,7 @@ export class VideoService {
 
     getVideoList(): Video[] {
         let videos: Video[] = [];
-        this.http.get(this.path).subscribe(data => {
+        this.http.get(this.URL + "/video").subscribe(data => {
             for (let i in data) {
                 let entry = data[i];
                 let video = {
