@@ -32,9 +32,9 @@ export class VideoService {
 
     getVideoList(): Video[] {
         let videos: Video[] = [];
-        return this.http.get(this.URL + "/video").subscribe(data => {
-            for (let i in data) {
-                let entry = data[i];
+        this.http.get(this.URL + "/video").subscribe((data: Array<any>) => {
+            console.log(data);
+            for (let entry of data) {
                 let video = {
                     id: entry.id,
                     name: entry.name,
@@ -45,7 +45,7 @@ export class VideoService {
                 };
                 videos.push(video);
             }
-            return videos;
         });
+        return videos;
     }
 }

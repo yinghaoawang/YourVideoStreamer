@@ -61,7 +61,7 @@ router.post('/', upload.single('file'), async (req, res, next) => {
             [sqlData.name, sqlData.date_recorded, sqlData.duration, sqlData.size, sqlData.url]
         ];
         let results = connection.query(sql, [values]);
-        res.status(200).send(results);
+        res.status(200).send(results[0]);
     } catch(err) {
         console.error(err);
         res.status(500).send(err);
@@ -73,7 +73,7 @@ router.get('/', async (req, res, next) => {
     try {
         var sql = "SELECT * FROM videos";
         let results = await connection.query(sql);
-        res.json(results)
+        res.status(200).send(results[0])
     } catch(err) {
         console.error(err);
         res.status(500).send(err);
@@ -85,7 +85,7 @@ router.get('/:id', async (req, res, next) => {
     var sql = "SELECT * FROM videos WHERE ID=" + id;
     try {
         let results = await connection.query(sql);
-        res.json(results);
+        res.status(200).send(results[0]);
     } catch(err) {
         res.status(500).send(err);
     }
