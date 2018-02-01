@@ -24,7 +24,6 @@ export class VideoService {
                 date_recorded: entry.date_recorded,
                 url: entry.url
             }
-            console.log(video);
 
             return video;
         });
@@ -33,7 +32,6 @@ export class VideoService {
     getVideoList(): Video[] {
         let videos: Video[] = [];
         this.http.get(this.URL + "/video").subscribe((data: Array<any>) => {
-            console.log(data);
             for (let entry of data) {
                 let video = {
                     id: entry.id,

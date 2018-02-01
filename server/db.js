@@ -1,5 +1,5 @@
 var mysql = require('mysql2/promise');
-var config = require('./config.json');
+var config = require('./config');
 var pool = mysql.createPool({
     connectionLimit: 20,
     host: config.mysql.host || process.env.SQL_HOST || 'localhost',
