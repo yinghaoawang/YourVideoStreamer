@@ -6,7 +6,7 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 export class VideoService {
-    public URL: string = 'http://localhost:8081';
+    public URL: string = 'http://localhost:8081';//'yvs-server.us-west-1.elasticbeanstalk.com';
 
     constructor(private http: HttpClient) { }
 
@@ -32,7 +32,7 @@ export class VideoService {
 
     getVideoList(): Video[] {
         let videos: Video[] = [];
-        this.http.get(this.URL + "/video").subscribe(data => {
+        return this.http.get(this.URL + "/video").subscribe(data => {
             for (let i in data) {
                 let entry = data[i];
                 let video = {
@@ -45,7 +45,7 @@ export class VideoService {
                 };
                 videos.push(video);
             }
+            return videos;
         });
-        return videos;
     }
 }

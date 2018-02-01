@@ -18,7 +18,6 @@ app.use(cookieParser());
 app.use(function(req, res, next) {
     req.setTimeout(0);
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
     next();
 });
