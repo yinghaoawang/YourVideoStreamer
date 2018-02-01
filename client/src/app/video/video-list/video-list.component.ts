@@ -4,11 +4,11 @@ import { VideoService } from '../video.service';
 
 @Component({
   selector: 'app-videos',
-  templateUrl: './videos.component.html',
-  styleUrls: ['./videos.component.css']
+  templateUrl: './video-list.component.html',
+  styleUrls: ['./video-list.component.css']
 })
 
-export class VideosComponent implements OnInit {
+export class VideoListComponent implements OnInit {
     videos: Video[] = [];
 
     constructor(private videoService: VideoService) { }

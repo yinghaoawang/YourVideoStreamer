@@ -4,29 +4,22 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 
+import { VideoModule } from './video/video.module';
+
 import { AppComponent } from './app.component';
-import { VideosComponent } from './videos/videos.component';
-import { VideoDetailComponent } from './video-detail/video-detail.component';
-import { VideoUploadComponent } from './video-upload/video-upload.component';
-
-import { VideoService } from './video.service';
-
-
 
 @NgModule({
   declarations: [
       AppComponent,
-      VideosComponent,
-      VideoDetailComponent,
-      VideoUploadComponent
   ],
   imports: [
       BrowserModule,
       FormsModule,
       HttpClientModule,
       AppRoutingModule,
+      VideoModule
   ],
-  providers: [VideoService],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
