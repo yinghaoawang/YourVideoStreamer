@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var cors = require('cors');
 
 var index = require('./routes/index');
 var video = require('./routes/video');
@@ -11,14 +12,30 @@ var video = require('./routes/video');
 var app = express();
 
 
+var whitelist = new Set(['http://localhost:4200']);
+var corsOptions = {
+    origin: function (origin, callback) {
+        if (whitelist.has(origin)) {
+            callback(null, true)
+        } else {
+            console.log(origin);
+            callback(new Error('Not allowed by CORS'))
+        }
+    }
+}
+
+app.use(cors(corsOptions));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 app.use(function(req, res, next) {
     req.setTimeout(0);
+    /*
     res.header("Access-Control-Allow-Origin", "*");
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+    */
     next();
 });
 
