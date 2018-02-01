@@ -4,6 +4,7 @@
 *.mp4
 *.avi
 server/config.json
+server/config.js
 server/tmp
 
 # Logs
