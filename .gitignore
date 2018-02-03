@@ -6,6 +6,8 @@
 server/config.json
 server/config.js
 server/tmp
+*/config.js
+*/config.json
 
 # Logs
 logs
