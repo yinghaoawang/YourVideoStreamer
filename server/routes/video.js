@@ -1,33 +1,20 @@
-var express = require('express');
-var router = express.Router();
-var fs = require('fs');
-var config = require('../config');
-var multer = require('multer');
-var upload = multer({ dest: 'tmp/' });
-var probe = require('node-ffprobe');
+const express = require('express');
+const router = express.Router();
+const fs = require('fs');
+const config = require('../config');
+const probe = require('node-ffprobe');
+const upload = require('../upload');
+const validator = require('../validator');
 
-var AWS = require('aws-sdk');
-AWS.config.update(config);
-var s3 = new AWS.S3();
 
-var connection = require('../db');
+let connection = require('../db');
 
 // when given params, upload file to aws and store the metadata in db as well as the direct aws file link
-router.post('/', upload.single('file'), async (req, res, next) => {
-    var duration, dateRecorded, name, size;
-    if (req.body.duration) duration = req.body.duration;
-    if (req.body.dateRecorded) dateRecorded = req.body.dateRecorded;
-    const rawFile = req.file;
-    const filePath = __dirname + "/../" + rawFile.path;
+router.post('/', upload.multer.single('file'), async (req, res, next) => {
     try {
-        /*
-        var probeData = {
-            "format": {
-                "duration": 0,
-            }
-        };
-        */
-        /* UNCOMMENT THIS ON LOCAL SERVER TO GET ACTUAL DURATION (COMMENTED BECAUSE DOES NOT WORK ON AWS)*/
+        const file = req.file;
+        const filePath = __dirname + "/../" + file.path;
+
         let probeData = await new Promise((resolve, reject) => {
             probe(filePath, (err, data) => {
                 if (err) reject(err);
@@ -35,37 +22,34 @@ router.post('/', upload.single('file'), async (req, res, next) => {
             });
         });
 
+        let duration = probeData.format.duration;
 
-        if (duration == null && probeData != null && probeData.format != null && probeData.format.duration != null)
-            duration = probeData.format.duration;
-        // default date recorded value
-        var file = fs.createReadStream(filePath);
-        var stat = fs.statSync(filePath);
-        if (dateRecorded == null) dateRecorded = stat.ctime;
-        var params = {
+        let stream = fs.createReadStream(filePath);
+        let stat = fs.statSync(filePath);
+
+        let dateRecorded = stat.ctime;
+        let params = {
             Bucket: config.bucketName,
-            Key: rawFile.originalname,
-            Body: file,
+            Key: file.originalname,
+            Body: stream,
         };
-        if (dateRecorded == null) dateRecorded = new Date().toISOString().slice(0, 19).replace('T', ' ');
-        if (duration == null) duration = 0;
-        console.log("uploading");
-        let s3Data = await s3.upload(params).promise();
-        var sqlData = {
-            'name': rawFile.originalname,
-            'size': rawFile.size,
+        //if (dateRecorded == null) dateRecorded = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        //if (duration == null) duration = 0;
+        let s3Data = await upload.uploadToS3(params);
+        let sqlData = {
+            'name': file.originalname,
+            'size': file.size,
             'date_recorded': dateRecorded,
             'duration': duration,
             'url': s3Data.Location,
         };
         console.log("uploaded");
 
-        var sql = "INSERT INTO videos (name, date_recorded, duration, size, url) VALUES ?";
-        var values = [
-            [sqlData.name, sqlData.date_recorded, sqlData.duration, sqlData.size, sqlData.url]
-        ];
-        let results = await connection.query(sql, [values]);
-        res.status(200).send(results[0]);
+        let results = await connection.query(
+            "INSERT INTO videos (name, date_recorded, duration, size, url) VALUES ?",
+            [sqlData.name, sqlData.date_recorded, sqlData.duration, sqlData.size, sqlData.url]);
+
+        res.status(201).send(results[0]);
     } catch(err) {
         console.error(err);
         res.status(500).send(err);
@@ -75,8 +59,7 @@ router.post('/', upload.single('file'), async (req, res, next) => {
 // returns all database video metadata
 router.get('/', async (req, res, next) => {
     try {
-        var sql = "SELECT * FROM videos";
-        let results = await connection.query(sql);
+        let results = await connection.query('SELECT * FROM videos');
         res.status(200).send(results[0])
     } catch(err) {
         console.error(err);
@@ -85,10 +68,9 @@ router.get('/', async (req, res, next) => {
 });
 
 router.get('/:id', async (req, res, next) => {
-    var id = req.params.id;
-    var sql = "SELECT * FROM videos WHERE ID=" + id;
     try {
-        let results = await connection.query(sql);
+        let id = req.params.id;
+        let results = await connection.query('SELECT * FROM videos WHERE ID=' + id);
         res.status(200).send(results[0]);
     } catch(err) {
         res.status(500).send(err);

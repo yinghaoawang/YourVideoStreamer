@@ -18,17 +18,18 @@ var corsOptions = {
         if (whitelist.has(origin)) {
             callback(null, true)
         } else {
-            console.log(origin);
             callback(new Error('Not allowed by CORS'))
         }
     }
 }
 
-app.use(cors(corsOptions));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+if (process.env.NODE_ENV == 'production')
+    app.use(cors(corsOptions));
 
 app.use(function(req, res, next) {
     req.setTimeout(0);
