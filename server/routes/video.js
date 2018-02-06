@@ -38,16 +38,16 @@ router.post('/', upload.multer.single('file'), async (req, res, next) => {
         let s3Data = await upload.uploadToS3(params);
         let sqlData = {
             'name': file.originalname,
-            'size': file.size,
             'date_recorded': dateRecorded,
             'duration': duration,
+            'size': file.size,
             'url': s3Data.Location,
         };
         console.log("uploaded");
 
         let results = await connection.query(
-            "INSERT INTO videos (name, date_recorded, duration, size, url) VALUES ?",
-            [sqlData.name, sqlData.date_recorded, sqlData.duration, sqlData.size, sqlData.url]);
+            "INSERT INTO videos SET ?",
+            sqlData);
 
         res.status(201).send(results[0]);
     } catch(err) {
