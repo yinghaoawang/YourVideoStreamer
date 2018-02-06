@@ -6,7 +6,11 @@ var multer = Multer({
 });
 
 var AWS = require('aws-sdk');
-AWS.config.update(config);
+AWS.config.update({
+    accessKeyID: config.accessKeyId,
+    secretAccessKey: config.secretAccessKey,
+    region: config.region
+});
 var s3 = new AWS.S3();
 
 async function uploadToS3(params) {

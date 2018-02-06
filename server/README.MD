@@ -3,21 +3,19 @@ An API server that utilizes Amazon Web Services Simple Storage (AWS S3 to store 
 The database stores the aws file link as well as information to organize the videos.
 
 ## Getting started
-* Create a config.json with the following keys
-    ```
-    {
-        "accessKeyId": "myKey",
-        "secretAccessKey": "mySecret",
-        "region": "myRegion",
-        "bucketName": "myBucket",
-        "mysql": {
-            "host": "myHost",
-            "user": "myUser",
-            "password": "myPass",
-            "database": "myDb"
-        }
-    }
-    ```
+- Set configuration variables
+    - Export environment variables by typing in the commands or putting it into your bashrc or equivalent
+        ```
+            export MYSQL_HOST="myHost"
+            export MYSQL_USER="myUser"
+            export MYSQL_PASSWORD="myPass"
+            export MYSQL_DATABASE="myDb"
+
+            export ACCESS_KEY_ID="mYaCcEsSKeY"
+            export SECRET_ACCESS_KEY="mYSeCReTkEy"
+            export REGION="my-region-1"
+            export BUCKET_NAME="myBucket"
+        ```
 * Set public get bucket policy for your AWS S3 bucket
     - Go to http://awspolicygen.s3.amazonaws.com/policygen.html
     - Use these settings
