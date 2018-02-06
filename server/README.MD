@@ -3,7 +3,7 @@ An API server that utilizes Amazon Web Services Simple Storage (AWS S3 to store 
 The database stores the aws file link as well as information to organize the videos.
 
 ## Getting started
-- Set configuration variables
+- Set configuration variables to your AWS and SQL connections
     - Export environment variables by typing in the commands or putting it into your bashrc or equivalent
         ```
             export MYSQL_HOST="myHost"
@@ -16,7 +16,7 @@ The database stores the aws file link as well as information to organize the vid
             export REGION="my-region-1"
             export BUCKET_NAME="myBucket"
         ```
-* Set public get bucket policy for your AWS S3 bucket
+* To view the videos, set public get bucket policy for your AWS S3 bucket
     - Go to http://awspolicygen.s3.amazonaws.com/policygen.html
     - Use these settings
         - Type of Policy: S3 Bucket Policy
@@ -31,14 +31,10 @@ The database stores the aws file link as well as information to organize the vid
         - Copy the text onto clipboard
     - Go to your bucket on AWS console
     - Go to Permissions > Bucket Policy
-        - Paste text from clipboard
-        - Save
+        - Paste text from clipboard and save
 * Install dependencies with `npm install`
-* Have a mySql database
 * Build mySql db and tables with `mysql -h <yourhost> -u <youruser> -p < createDB.sql` (it will query you for password)
-* Start node server
-    * Normally with `npm start`
-    * or with a watcher `npm run devstart`
+* Start node server with `npm start`
 
 ## Built with
 - NodeJS - Javascript backend
